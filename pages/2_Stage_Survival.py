@@ -15,5 +15,30 @@ df = pd.read_csv("data/seer_breast_cancer_cleaned.csv")
 df["event"] = (df["Status"] == "Dead").astype(int)
 df["stage_group"] = df["6th Stage"].str.startswith("III").map({True: "Stage III", False: "Stage II"})
 
-st.metric("Patients", len(df))
-st.metric("Deaths", int(df["event"].sum()))
+options = {
+    "Stage II vs Stage III": ("stage_group", ["Stage II", "Stage III"]),
+    "Stage (IIA to IIIC)": ("6th Stage", ["IIA", "IIB", "IIIA", "IIIB", "IIIC"]),
+    "Tumor stage (T)": ("T Stage", ["T1", "T2", "T3", "T4"]),
+    "Lymph node stage (N)": ("N Stage", ["N1", "N2", "N3"]),
+}
+
+choice = st.selectbox("Compare survival by:", list(options.keys()))
+column, groups = options[choice]
+
+fig, ax = plt.subplots(figsize=(8, 5))
+rows = []
+for group in groups:
+    data = df[df[column] == group]
+    kmf = KaplanMeierFitter()
+    kmf.fit(data["Survival Months"], data["event"], label=group)
+    kmf.plot_survival_function(ax=ax)
+    five = kmf.survival_function_at_times(60).iloc[0]
+    rows.append({"Group": group, "Patients": len(data), "5-year survival (%)": round(five * 100, 1)})
+
+ax.set_ylim(0, 1)
+ax.set_xlabel("Months since diagnosis")
+ax.set_ylabel("Share of patients alive")
+ax.set_title(f"Overall survival by {choice}")
+st.pyplot(fig)
+
+st.dataframe(pd.DataFrame(rows), hide_index=True)
