@@ -25,12 +25,6 @@ def prepare_analysis_groups(data):
     df["Stage Group"] = df["6th Stage"].map({
         "IIA": "II", "IIB": "II", "IIIA": "III", "IIIB": "III", "IIIC": "III",
     })
-    # Recorded vital status only; a fixed 5-year outcome needs follow-up rules.
+    # Event indicator paired with follow-up time, as on the Stage Survival page.
     df["Death Event"] = df["Status"].map({"Dead": 1, "Alive": 0}).astype("Int64")
-    months = pd.to_numeric(df["Survival Months"], errors="coerce")
-    valid = months.ge(0) & df["Status"].isin(["Dead", "Alive"])
-    outcome = pd.Series(pd.NA, index=df.index, dtype="Int64")
-    outcome.loc[valid & months.ge(60)] = 0
-    outcome.loc[valid & df["Status"].eq("Dead") & months.le(60)] = 1
-    df["5-Year Death Outcome"] = outcome
     return df

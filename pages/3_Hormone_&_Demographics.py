@@ -3,6 +3,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from lifelines import KaplanMeierFitter
 
 from analysis_groups import prepare_analysis_groups
 
@@ -72,13 +73,18 @@ def main():
         st.stop()
 
     df = prepare_analysis_groups(df)
-    st.subheader("5-Year Outcome")
-    outcome = df["5-Year Death Outcome"]
+    st.subheader("Overall Survival")
+    months = pd.to_numeric(df["Survival Months"], errors="coerce")
+    valid = months.ge(0) & df["Death Event"].notna()
     columns = st.columns(3)
-    columns[0].metric("Death by 60 months (1)", int(outcome.eq(1).sum()))
-    columns[1].metric("Alive at 60 months (0)", int(outcome.eq(0).sum()))
-    columns[2].metric("Unknown at 60 months", int(outcome.isna().sum()))
-    st.write("Death by 60 months = 1; alive at 60 months = 0. Patients last seen alive before 60 months have an unknown outcome. These counts are not a survival-rate estimate.")
+    columns[0].metric("Dead (1)", int(df["Death Event"].eq(1).sum()))
+    columns[1].metric("Alive (0)", int(df["Death Event"].eq(0).sum()))
+    if valid.any():
+        kmf = KaplanMeierFitter()
+        kmf.fit(months[valid], df.loc[valid, "Death Event"].astype(int))
+        five_year = kmf.survival_function_at_times(60).iloc[0]
+        columns[2].metric("5-year survival", f"{five_year * 100:.1f}%")
+    st.write("Dead = 1 and Alive = 0 at the last follow-up. Five-year overall survival is estimated at 60 months using Kaplan–Meier, as on the Stage Survival page. Patients last seen alive are censored at their recorded follow-up time.")
     st.subheader("Hormone Status")
     counts = df["Hormone Status"].value_counts().reindex(STATUSES, fill_value=0)
     chart_data = counts.rename_axis("Hormone Status").reset_index(name="Patients")
