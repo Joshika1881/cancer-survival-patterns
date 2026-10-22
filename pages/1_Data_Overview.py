@@ -35,7 +35,7 @@ fig_age = px.histogram(
     title="Age Distribution of Patients"
 )
 
-st.plotly_chart(fig_age, width="stretch")
+st.plotly_chart(fig_age, use_container_width=True)
 
 st.write(
     "This visualization shows the distribution of patient ages "
@@ -52,7 +52,7 @@ fig_status = px.histogram(
     text_auto=True
 )
 
-st.plotly_chart(fig_status, width="stretch")
+st.plotly_chart(fig_status, use_container_width=True)
 
 st.write(
     "This visualization compares the number of patients recorded "
@@ -73,7 +73,7 @@ fig_race = px.bar(
     text="Count"
 )
 
-st.plotly_chart(fig_race, width="stretch")
+st.plotly_chart(fig_race, use_container_width=True)
 
 st.write(
     "This visualization shows the racial composition of patients "
@@ -94,7 +94,7 @@ fig_marital = px.bar(
     text="Count"
 )
 
-st.plotly_chart(fig_marital, width="stretch")
+st.plotly_chart(fig_marital, use_container_width=True)
 
 st.write(
     "This visualization provides an overview of the marital status "
@@ -111,7 +111,7 @@ fig_survival = px.histogram(
     title="Distribution of Survival Months"
 )
 
-st.plotly_chart(fig_survival, width="stretch")
+st.plotly_chart(fig_survival, use_container_width=True)
 
 st.write(
     "This distribution shows the range of recorded survival times "

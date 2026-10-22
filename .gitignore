@@ -6,6 +6,7 @@ profile_default/
 ipython_config.py
 
 # Python
+.venv/
 cython_debug/
 *__pycache__/
 *.py[cod]
@@ -29,5 +30,6 @@ data
 
 # project
 .env
-.streamlit
+.streamlit/*
+!.streamlit/config.toml
 environment.yml
