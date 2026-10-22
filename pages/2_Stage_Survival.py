@@ -42,3 +42,17 @@ ax.set_title(f"Overall survival by {choice}")
 st.pyplot(fig)
 
 st.dataframe(pd.DataFrame(rows), hide_index=True)
+
+used = df[df[column].isin(groups)]
+p = multivariate_logrank_test(used["Survival Months"], used[column], used["event"]).p_value
+
+if p < 0.05:
+    st.success(f"The difference between these groups is larger than chance would explain (log-rank p = {p:.3g}).")
+else:
+    st.warning(f"The difference could be due to chance (log-rank p = {p:.3g}).")
+
+st.caption(
+    "Stage is built from tumor stage (T) and node stage (N), so Stage IIIC and N3 are the same patients. "
+    "Stage IIIB has only 67 patients, so its curve is less certain. "
+    "Survival here includes death from any cause."
+)
