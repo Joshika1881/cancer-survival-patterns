@@ -8,6 +8,15 @@ import streamlit as st
 RECEPTORS = ["Estrogen Status", "Progesterone Status"]
 STATUSES = ["Positive", "Negative"]
 COLORS = {"Positive": "#277DA8", "Negative": "#F4A261"}
+LABELS = {
+    "Other (American Indian/AK Native, Asian/Pacific Islander)": "Other*",
+    "Married (including common law)": "Married",
+    "Single (never married)": "Single",
+    "Well differentiated; Grade I": "Grade I",
+    "Moderately differentiated; Grade II": "Grade II",
+    "Poorly differentiated; Grade III": "Grade III",
+    "Undifferentiated; anaplastic; Grade IV": "Grade IV",
+}
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "seer_breast_cancer_cleaned.csv"
 
 
@@ -25,7 +34,7 @@ def show_group_comparison(df, group):
         )
         totals = counts.sum(axis=1)
         percentages = counts.div(totals.replace(0, float("nan")), axis=0) * 100
-        percentages.index = [f"{label} (n={total:,})" for label, total in totals.items()]
+        percentages.index = [f"{LABELS.get(label, label)} (n={total:,})" for label, total in totals.items()]
         percentages.index.name = group
         chart_data = percentages.reset_index().melt(
             id_vars=group, var_name="Receptor status", value_name="Percent"
@@ -36,8 +45,23 @@ def show_group_comparison(df, group):
             color_discrete_map=COLORS, category_orders={"Receptor status": STATUSES},
             range_x=[0, 100], height=max(360, len(totals) * 65 + 150),
         )
-        figure.update_layout(yaxis_title=None, xaxis_title="Percent within group")
-        column.plotly_chart(figure, width="stretch")
+        figure.update_layout(
+            yaxis_title=None, xaxis_title="Percent within group",
+            legend=dict(orientation="h", y=1.15, x=0),
+            margin=dict(l=10, r=15, t=110, b=45),
+        )
+        figure.update_traces(hovertemplate="%{y}<br>%{x:.1f}%<extra>%{fullData.name}</extra>")
+        column.plotly_chart(figure, use_container_width=True)
+        rates = percentages["Positive"].dropna()
+        if not rates.empty:
+            column.caption(
+                f"Positive status ranges from {rates.min():.1f}% to {rates.max():.1f}% "
+                f"across the recorded {group.lower()} groups. Group sizes are shown in the labels."
+            )
+    if group == "Race":
+        st.caption("*Other combines American Indian/Alaska Native and Asian/Pacific Islander patients, as recorded in the dataset.")
+    if group == "Grade":
+        st.caption("Grade I: well differentiated; II: moderately differentiated; III: poorly differentiated; IV: undifferentiated/anaplastic.")
 
 
 def main():
@@ -65,7 +89,7 @@ def main():
             text="Patients", title=receptor, color_discrete_map=COLORS,
             category_orders={"Receptor status": STATUSES},
         )
-        column.plotly_chart(figure, width="stretch")
+        column.plotly_chart(figure, use_container_width=True)
         valid_total = counts.sum()
         if valid_total:
             column.caption(f"{counts['Positive'] / valid_total:.1%} positive among patients with recorded positive/negative status.")
@@ -77,7 +101,14 @@ def main():
             title=f"Age by {receptor.lower()}", color_discrete_map=COLORS,
             category_orders={receptor: STATUSES}, labels={"Age": "Age (years)"},
         )
-        column.plotly_chart(figure, width="stretch")
+        column.plotly_chart(figure, use_container_width=True)
+        medians = df.groupby(receptor)["Age"].median()
+        if all(status in medians and pd.notna(medians[status]) for status in STATUSES):
+            column.caption(
+                f"Median age: {medians['Positive']:.0f} years for positive status and "
+                f"{medians['Negative']:.0f} years for negative status. "
+                "The boxes show the middle half of ages in each group."
+            )
 
     for group in ["Race", "Marital Status", "Grade"]:
         st.subheader(f"Receptor Status by {group}")

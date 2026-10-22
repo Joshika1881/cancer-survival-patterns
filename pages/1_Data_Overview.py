@@ -22,7 +22,7 @@ fig_age = px.histogram(
     title="Age Distribution of Patients"
 )
 
-st.plotly_chart(fig_age, width="stretch")
+st.plotly_chart(fig_age, use_container_width=True)
 
 st.subheader("Patient Survival Status")
 
@@ -33,4 +33,4 @@ fig_status = px.histogram(
     text_auto=True
 )
 
-st.plotly_chart(fig_status, width="stretch")
+st.plotly_chart(fig_status, use_container_width=True)
