@@ -26,7 +26,7 @@ def load_data(path):
     return pd.read_csv(path)
 
 
-def show_group_comparison(df, group):
+def show_group_comparison(df, group, status="Both"):
     counts = pd.crosstab(df[group], df["Hormone Status"]).reindex(
         columns=STATUSES, fill_value=0
     )
@@ -40,17 +40,19 @@ def show_group_comparison(df, group):
     chart_data = percentages.reset_index().melt(
         id_vars=group, var_name="Hormone Status", value_name="Percent"
     )
+    if status != "Both":
+        chart_data = chart_data[chart_data["Hormone Status"] == status]
     figure = px.bar(
         chart_data, x=group, y="Percent", color="Hormone Status",
         barmode="stack", title=f"Hormone Status by {group}",
         category_orders={"Hormone Status": STATUSES}, range_y=[0, 100],
     )
     st.plotly_chart(figure, use_container_width=True)
-    st.write("This chart compares positive and negative hormone status within each group. Group sizes are shown in the labels.")
+    st.write("Percentages use all patients with known hormone status in each group. Group sizes are shown in the labels.")
     if group == "Race":
         st.caption("Other includes American Indian/Alaska Native and Asian/Pacific Islander patients.")
     elif group == "Age Group":
-        st.caption("Age groups: under 50, 50–59, and 60–69. Other ages and missing ages are excluded from this chart.")
+        st.caption("Age groups: under 50, 50–59, and 60–69.")
     elif group == "Grade Group":
         st.caption("Grades III and IV are combined because Grade IV has a small sample.")
 
@@ -95,9 +97,13 @@ def main():
     st.plotly_chart(figure, use_container_width=True)
     st.write("Hormone status is positive if ER or PR is positive, and negative if both are negative.")
 
-    for group in ["Age Group", "Race", "Marital Status", "Grade Group", "Stage", "Stage Group"]:
-        st.subheader(f"Hormone Status by {group}")
-        show_group_comparison(df, group)
+    st.subheader("Compare Hormone Status")
+    group = st.selectbox(
+        "Compare by:",
+        ["Age Group", "Race", "Marital Status", "Grade Group", "Stage", "Stage Group"],
+    )
+    status = st.selectbox("Show hormone status:", ["Both", "Positive", "Negative"])
+    show_group_comparison(df, group, status)
     st.caption("Comparisons describe this dataset and do not establish causes or survival effects.")
 
 
