@@ -1,74 +1,58 @@
 import streamlit as st
 
-# ---------------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------------
 st.set_page_config(
     page_title="Breast Cancer Survival Patterns",
-    page_icon="🎗️",
     layout="wide"
 )
 
-# ---------------------------------------------------------
-# HERO SECTION
-# ---------------------------------------------------------
-st.title("🎗️ Breast Cancer Survival Patterns")
+st.title("Breast Cancer Survival Patterns")
 
 st.markdown(
     """
-    Explore patterns in breast cancer survival using the **SEER Breast Cancer dataset**.
-    This interactive application summarizes patient characteristics, clinical factors,
-    cancer stage, hormone receptor status, and survival patterns.
+    Explore patterns in breast cancer survival using the
+    **SEER Breast Cancer dataset**.
+
+    This application summarizes patient characteristics,
+    clinical stage patterns, hormone and demographic factors,
+    and survival outcomes.
     """
 )
 
 st.info(
-    "Use the navigation in the sidebar to move between the Data Overview, "
-    "Stage Survival, and Hormone & Demographics sections."
+    "Use the navigation menu in the sidebar to explore each section of the application."
 )
 
 st.divider()
 
-# ---------------------------------------------------------
-# PROJECT OVERVIEW
-# ---------------------------------------------------------
 st.subheader("Project Overview")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.metric("Patients", "4,023")
-    st.caption(
-        "Patients included after cleaning and removing the duplicate record."
-    )
+    st.caption("Patients included in the cleaned dataset")
 
 with col2:
     st.metric("Age Range", "30–69")
-    st.caption(
-        "Patient ages represented in the SEER breast cancer dataset."
-    )
+    st.caption("Age range represented in the dataset")
 
 with col3:
     st.metric("Cancer Stages", "IIA–IIIC")
-    st.caption(
-        "The dataset contains Stage II and Stage III breast cancer cases."
-    )
+    st.caption("Clinical stages represented in the dataset")
 
 st.divider()
 
-# ---------------------------------------------------------
-# APP SECTIONS
-# ---------------------------------------------------------
 st.subheader("Explore the Application")
 
 overview_col, stage_col, hormone_col = st.columns(3)
 
 with overview_col:
-    st.markdown("### 📊 Data Overview")
+    st.markdown("### Data Overview")
     st.write(
-        "Explore the overall patient population through summary metrics, "
-        "demographic distributions, survival months, and an interactive "
-        "group summary."
+        """
+        Explore the overall characteristics of the dataset
+        and interact with patient group summaries.
+        """
     )
 
     st.markdown(
@@ -78,33 +62,38 @@ with overview_col:
         - Race distribution
         - Marital status
         - Survival status
-        - Interactive patient-group summaries
+        - Survival months
+        - Interactive group summary
         """
     )
 
 with stage_col:
-    st.markdown("### 📈 Stage Survival")
+    st.markdown("### Stage Survival")
     st.write(
-        "Compare survival patterns across cancer stage, tumor stage, "
-        "and lymph node involvement using survival analysis."
+        """
+        Compare survival patterns across different
+        breast cancer stages.
+        """
     )
 
     st.markdown(
         """
         **Includes:**
         - Kaplan-Meier survival curves
-        - 5-year survival estimates
-        - Stage II vs Stage III
+        - Five-year survival estimates
+        - Stage II vs. Stage III
         - Detailed Stage IIA–IIIC comparisons
-        - Log-rank test results
+        - Log-rank comparisons
         """
     )
 
 with hormone_col:
-    st.markdown("### 🧬 Hormone & Demographics")
+    st.markdown("### Hormone & Demographics")
     st.write(
-        "Explore hormone receptor status and how patient and clinical "
-        "characteristics are distributed across the dataset."
+        """
+        Explore how hormone status and demographic
+        characteristics relate to survival patterns.
+        """
     )
 
     st.markdown(
@@ -113,22 +102,14 @@ with hormone_col:
         - Hormone receptor status
         - Age groups
         - Race
-        - Grade groups
-        - Demographic comparisons
+        - Tumor grade
+        - Group comparisons
         """
     )
 
 st.divider()
 
-# ---------------------------------------------------------
-# ANALYSIS DEFINITIONS
-# ---------------------------------------------------------
 st.subheader("Shared Analysis Definitions")
-
-st.write(
-    "To keep all sections of the application consistent, the team uses "
-    "the same analysis groups throughout the project."
-)
 
 definition_col1, definition_col2 = st.columns(2)
 
@@ -141,8 +122,8 @@ with definition_col1:
         - 60–69
 
         **Stage Groups**
-        - Stage II
-        - Stage III
+        - Stage II: IIA and IIB
+        - Stage III: IIIA, IIIB, and IIIC
         """
     )
 
@@ -155,35 +136,32 @@ with definition_col2:
         - Grade III–IV
 
         **Hormone Status**
-        - Positive if estrogen receptor (ER) or progesterone receptor (PR) is positive
+        - Positive if estrogen receptor or progesterone receptor status is positive
+        - Negative if both are negative
         """
     )
 
 st.divider()
 
-# ---------------------------------------------------------
-# HOW TO USE
-# ---------------------------------------------------------
 st.subheader("How to Use This App")
 
 st.markdown(
     """
     1. Start with **Data Overview** to understand the patient population.
-    2. Use the **Interactive Group Summary** to select a patient characteristic
-       and view group-level results.
-    3. Open **Stage Survival** to compare survival patterns across clinical stages.
-    4. Explore **Hormone & Demographics** for additional patient and clinical comparisons.
+    2. Use the **Interactive Group Summary** to explore selected patient groups.
+    3. Visit **Stage Survival** to compare survival patterns across cancer stages.
+    4. Visit **Hormone & Demographics** to explore additional patient characteristics.
     """
 )
 
 st.divider()
 
-# ---------------------------------------------------------
-# DISCLAIMER
-# ---------------------------------------------------------
 st.warning(
-    "Educational Use Only: This application is intended for exploratory "
-    "data analysis and educational purposes. The results describe patterns "
-    "in this dataset and should not be interpreted as medical advice, "
-    "diagnosis, or an individual survival prediction."
+    """
+    Educational Use Only
+
+    This application is intended for educational data analysis.
+    It does not provide medical advice, diagnosis, treatment recommendations,
+    or individual survival predictions.
+    """
 )
